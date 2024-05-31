@@ -1,8 +1,10 @@
 import sys
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 from pandas import json_normalize
 import pyodbc
+from sqlalchemy import create_engine
 
 def crawl_products(cg_link, cg_id):
 
@@ -120,25 +122,35 @@ if __name__ == '__main__':
     except:
         print('Connection SQL Server Unsuccessfully')
 
-    # Insert Categories
+    # Insert Data to Categories table
     for index, row in df_categories.iterrows():
-        try:
-            cursor.execute("INSERT INTO Categories (cg_id, cg_name, cg_link) VALUES(?,?,?)", row.cg_id, row.cg_name, row.cg_link)
-            sys.stdout.write(f'Index {index} of Categories has been inserted to the SQL Server\r')
-            sys.stdout.flush()
-        except requests.exceptions.RequestException as e:
-            print(f'Error at Index {index} of Categories: {e}')
+        cursor.execute("INSERT INTO Categories (cg_id, cg_name, cg_link) VALUES(?,?,?)", row.cg_id, row.cg_name, row.cg_link)
+        sys.stdout.write(f'Data at Index {index} has been inserted to the Categories table\r')
+        sys.stdout.flush()
+    sys.stdout.write('\n')
 
-    # Insert Products
+    # Insert Data to Products table
+    for index, row in df_products.drop(['cg_id', 'p_link'], axis=1).drop_duplicates().iterrows():
+        cursor.execute("INSERT INTO Products (p_image, p_id, p_name, p_price) VALUES(?,?,?,?)", row.p_image, row.p_id, row.p_name, row.p_price)
+        sys.stdout.write(f'Data at Index {index} has been inserted to the Products table\r')
+        sys.stdout.flush()
+    sys.stdout.write('\n')
+
+    # Insert Data to Product_Links table
     for index, row in df_products.iterrows():
-        try:
-            cursor.execute("INSERT INTO Products (p_image, p_id, p_name, p_price, cg_id, p_link) VALUES(?,?,?,?,?,?)", row.p_image, row.p_id, row.p_name, row.p_price, row.cg_id, row.p_link)
-            sys.stdout.write(f'Index {index} of Products has been inserted to the SQL Server\r')
-            sys.stdout.flush()
-        except requests.exceptions.RequestException as e:
-            print(f'Error at Index {index} of Products: {e}')
+        cursor.execute("INSERT INTO Product_Links (p_id, p_link) VALUES(?,?)", row.p_id, row.p_link)
+        sys.stdout.write(f'Data at Index {index} has been inserted to the Product_Links table\r')
+        sys.stdout.flush()
+    sys.stdout.write('\n')
 
-    print('All data have been inserted successfully')
+    # Insert Data to Product_Categories table
+    for index, row in df_products[['p_id', 'cg_id']].drop_duplicates().iterrows():
+        cursor.execute("INSERT INTO Product_Categories (p_id, cg_id) VALUES(?,?)", row.p_id, row.cg_id)
+        sys.stdout.write(f'Data at Index {index} has been inserted to the Product_Categories table\r')
+        sys.stdout.flush()
+    sys.stdout.write('\n')
+
+    sys.stdout.write('All data have been inserted successfully')
 
     cursor.commit()
     cursor.close()
