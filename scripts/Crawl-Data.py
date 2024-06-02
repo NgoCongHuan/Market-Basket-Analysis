@@ -136,16 +136,9 @@ if __name__ == '__main__':
         sys.stdout.flush()
     sys.stdout.write('\n')
 
-    # Insert Data to Product_Links table
-    for index, row in df_products.iterrows():
-        cursor.execute("INSERT INTO Product_Links (p_id, p_link) VALUES(?,?)", row.p_id, row.p_link)
-        sys.stdout.write(f'Data at Index {index} has been inserted to the Product_Links table\r')
-        sys.stdout.flush()
-    sys.stdout.write('\n')
-
     # Insert Data to Product_Categories table
-    for index, row in df_products[['p_id', 'cg_id']].drop_duplicates().iterrows():
-        cursor.execute("INSERT INTO Product_Categories (p_id, cg_id) VALUES(?,?)", row.p_id, row.cg_id)
+    for index, row in df_products[['p_id', 'cg_id', 'p_link']].drop_duplicates(subset=['p_id', 'cg_id']).iterrows():
+        cursor.execute("INSERT INTO Product_Categories (p_id, cg_id, p_link) VALUES(?,?,?)", row.p_id, row.cg_id, row.p_link)
         sys.stdout.write(f'Data at Index {index} has been inserted to the Product_Categories table\r')
         sys.stdout.flush()
     sys.stdout.write('\n')

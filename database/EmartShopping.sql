@@ -31,26 +31,42 @@ CREATE TABLE Product_Categories (
 	foreign key (cg_id) references Categories(cg_id)
 )
 
-CREATE TABLE Orders (
-	o_date datetime,
-	o_id varchar(20),
+CREATE TABLE Transactions (
+	t_date datetime,
+	t_id varchar(20),
 	p_id int,
 	p_price int,
 	p_quantity int
+)
+
+CREATE TABLE Market_Basket_Analysis(
+	antecedents nvarchar(100),
+	consequents nvarchar(100),
+	antecedent_support float,
+	consequent_support float,
+	support float,
+	confidence float,
+	lift float
 )
 
 SELECT * FROM Products
 SELECT * FROM Product_Links
 SELECT * FROM Categories
 SELECT * FROM Product_Categories
-SELECT * FROM Orders
+SELECT * FROM Transactions
+SELECT * FROM Market_Basket_Analysis
 
 delete Products
 delete Categories
 delete Product_Links
 delete Orders
 delete Product_Categories
+delete Market_Basket_Analysis
 
-SELECT p_id, p_name, p_price FROM Products
-
-SELECT o_id, p_name FROM Orders O inner join Products P on O.p_id = P.p_id 
+ 
+DROP TABLE Products
+DROP TABLE Categories
+DROP TABLE Product_Links
+DROP TABLE Orders
+DROP TABLE Product_Categories
+DROP TABLE Market_Basket_Analysis

@@ -7,16 +7,45 @@ from pandas import json_normalize
 from sqlalchemy import create_engine
 from datetime import datetime, timedelta
 import time
+import random
 
-def generate_random_products(df_products):
+def generate_frequent_itemsets(df_products):
+
+    list_json_frequent_itemsets = []
+
+    for _ in range(0, 3):
+
+        n_sample = np.random.randint(2,4)
+
+        df_frequent_itemsets = df_products.sample(n=n_sample, replace=False)
+
+        index_to_drop = list(df_frequent_itemsets.index)
+
+        df_products = df_products.drop(index_to_drop)
+
+        json_frequent_itemsets = df_frequent_itemsets.to_dict('records')
+
+        list_json_frequent_itemsets.append(json_frequent_itemsets)
+    
+    return list_json_frequent_itemsets
+
+def generate_random_products(df_products, list_json_frequent_itemsets):
 
     random_products = []
 
     # Create random quantity sample product
-    n_sample = np.random.randint(1,11)
+    n_sample = np.random.randint(1,6)
 
     # Random sample products
     df_products = df_products.sample(n=n_sample, replace=False)
+
+    json_frequent_itemsets = random.choice(list_json_frequent_itemsets)
+
+    df_json_frequent_itemsets = pd.DataFrame(json_frequent_itemsets)
+
+    df_products = pd.concat([df_products, df_json_frequent_itemsets], ignore_index=True)
+
+    df_products = df_products.drop_duplicates(subset='p_id')
 
     # Create list random products
     for i in range(df_products.shape[0]):
@@ -25,16 +54,16 @@ def generate_random_products(df_products):
 
         random_product['p_id'] = df_products['p_id'].iloc[i]
         random_product['p_price'] = df_products['p_price'].iloc[i]
-        random_product['p_quantity'] = np.random.randint(1,6)
+        random_product['p_quantity'] = np.random.randint(1,3)
 
         random_products.append(random_product)
 
     return random_products
 
-def generate_random_time():
+def generate_random_time(day):
 
     # Get the current date
-    now = datetime.now()
+    now = datetime.now() + timedelta(days=day)
     start = datetime(now.year, now.month, now.day, 7)
 
     # Parameters for random time
@@ -50,26 +79,36 @@ def generate_random_time():
 
     return random_time
 
-def generate_orders(total):
+def generate_transactions(df_products, list_json_frequent_itemsets, total, day):
 
-    orders = []
+    transaction_detail = []
 
-    for o_id in range(1, total+1):
+    transactions = []
 
-        o_date = generate_random_time()
+    for t_id in range(1, total+1):
 
-        random_products = generate_random_products(df_products)
+        t_date = generate_random_time(day)
 
-        for order in random_products:
+        t_total = 0
 
-            order['o_id'] = o_date.split(' ')[0].replace('-', '') + str(o_id) 
-            order['o_date'] = o_date
+        random_products = generate_random_products(df_products, list_json_frequent_itemsets)
 
-            orders.append(order)
+        for transaction in random_products:
+
+            transaction['t_id'] = t_date.split(' ')[0].replace('-', '') + str(t_id) 
+
+            transaction_detail.append(transaction)
+
+            t_total += (transaction['p_price'] * transaction['p_quantity'])
+
+        t_id = t_date.split(' ')[0].replace('-', '') + str(t_id) 
+
+        transactions.append({'t_id': t_id, 't_date': t_date, 't_total': t_total})
     
-    df_orders = json_normalize(orders)
+    df_transactions = json_normalize(transactions)
+    df_transaction_detail = json_normalize(transaction_detail)
         
-    return df_orders
+    return df_transactions, df_transaction_detail
 
 if __name__ == '__main__':
 
@@ -82,20 +121,6 @@ if __name__ == '__main__':
     # Create SQLAlchemy engine
     engine = create_engine(f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server')
 
-    # Read data and convert to Dataframe
-    df = pd.read_sql_query('SELECT PC.p_id, p_price, cg_id FROM Products P right outer join Product_Categories PC on P.p_id = PC.p_id', engine)
-
-    df_products = pd.DataFrame()
-
-    for cg_id in df['cg_id'].unique():
-
-        df_temp = df[df['cg_id'] == cg_id].sample(2)
-
-        df_products = pd.concat([df_products, df_temp], ignore_index=True)
-    
-    # Generate Orders
-    df_orders = generate_orders(738)
-
     # Connection SQL Server
     try:
         
@@ -107,21 +132,50 @@ if __name__ == '__main__':
 
         print('Connection SQL Server Unsuccessfully')
 
-    # Insert Orders
-    for index, row in df_orders.iterrows():
-
-        try:
-
-            cursor.execute("INSERT INTO Orders (o_date, o_id, p_id, p_price, p_quantity) VALUES(?,?,?,?,?)", row.o_date, row.o_id, row.p_id, row.p_price, row.p_quantity)
-            sys.stdout.write(f'Data at Index {index} has been inserted to the Orders table\r')
-            time.sleep(0.03)
-
-        except requests.exceptions.RequestException as e:
-
-            sys.stdout.write(f'Error at Index {index} of Orders: {e}')
+    # Read data and convert to Dataframe
+    df_products = pd.read_sql_query('SELECT p_id, p_price FROM Products', engine)
     
-    sys.stdout.write('\n')
-    sys.stdout.write('All Orders have been Inserted to Orders table')
+    list_json_frequent_itemsets = generate_frequent_itemsets(df_products)
+
+    for day in range(0,29):
+
+        total = np.random.randint(400,1500)
+
+        # Generate Transactions
+        df_transactions, df_transaction_detail = generate_transactions(df_products, list_json_frequent_itemsets, total, day)
+
+        # Insert Transactions
+        for index, row in df_transactions.iterrows():
+
+            try:
+
+                cursor.execute("INSERT INTO Transactions (t_id, t_date, t_total) VALUES(?,?,?)", row.t_id, row.t_date, row.t_total)
+                sys.stdout.write(row.t_date.split(' ')[0])
+                sys.stdout.write(f' Data at Index {index} has been inserted to the Transactions table\r')
+                time.sleep(0.01)
+
+            except requests.exceptions.RequestException as e:
+
+                sys.stdout.write(f'Error at Index {index} of Transactions: {e}')
+        
+        sys.stdout.write('\n')
+
+        # Insert Transactions
+        for index, row in df_transaction_detail.iterrows():
+
+            try:
+
+                cursor.execute("INSERT INTO Transaction_Detail (t_id, p_id, p_price, p_quantity) VALUES(?,?,?,?)", row.t_id, row.p_id, row.p_price, row.p_quantity)
+                sys.stdout.write(f'Data at Index {index} has been inserted to the Transaction Detail table\r')
+                time.sleep(0.01)
+
+            except requests.exceptions.RequestException as e:
+
+                sys.stdout.write(f'Error at Index {index} of Transactions: {e}')
+        
+        sys.stdout.write('\n')
+    
+    sys.stdout.write('All Transactions have been Inserted to Transactions table')
     
     cursor.commit()
     cursor.close()

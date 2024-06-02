@@ -18,9 +18,9 @@ password = 'huan181102'
 engine = create_engine(f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server')
 
 # Read data and convert to Dataframe
-df_orders = pd.read_sql_query('SELECT o_id, p_id FROM Orders', engine)
+df_orders = pd.read_sql_query('SELECT t_id, p_id FROM Transaction_Detail', engine)
 
-grouped = df_orders.groupby('o_id')['p_id'].apply(list)
+grouped = df_orders.groupby('t_id')['p_id'].apply(list)
 
 list_grouped = list(grouped)
 
@@ -28,7 +28,7 @@ te = TransactionEncoder()
 te_ary = te.fit(list_grouped).transform(list_grouped)
 df_new = pd.DataFrame(te_ary, columns=te.columns_)
 
-frequent_itemsets = apriori(df_new, min_support = 0.01 ,use_colnames=True)
+frequent_itemsets = apriori(df_new, min_support = 0.001 ,use_colnames=True)
 
 if frequent_itemsets.empty:
     print('Frequent is empty')
