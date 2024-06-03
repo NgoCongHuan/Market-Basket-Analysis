@@ -6,6 +6,7 @@ from pandas import json_normalize
 import pyodbc
 from sqlalchemy import create_engine
 
+# Crawl all Products in each page of each Category
 def crawl_products(cg_link, cg_id):
 
     product_json = []
@@ -62,6 +63,7 @@ def crawl_products(cg_link, cg_id):
     
     return product_json
 
+# Crawl all Categories in EmartShopping
 def crawl_categories():
 
     try:
@@ -103,8 +105,10 @@ def crawl_categories():
 
 if __name__ == '__main__':
     
+    # Create variables with function
     categories_json, products_json = crawl_categories()
     
+    # Convert to DataFrame
     df_categories = json_normalize(categories_json)
     df_products = json_normalize(products_json)
 
@@ -145,5 +149,6 @@ if __name__ == '__main__':
 
     sys.stdout.write('All data have been inserted successfully')
 
+    # Commit and Close Cursor
     cursor.commit()
     cursor.close()

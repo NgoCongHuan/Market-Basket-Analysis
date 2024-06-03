@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import time
 import random
 
+# Create List of Frequent itemsets 
 def generate_frequent_itemsets(df_products):
 
     list_json_frequent_itemsets = []
@@ -29,6 +30,7 @@ def generate_frequent_itemsets(df_products):
     
     return list_json_frequent_itemsets
 
+# Create Products of each Transactions
 def generate_random_products(df_products, list_json_frequent_itemsets):
 
     random_products = []
@@ -60,6 +62,7 @@ def generate_random_products(df_products, list_json_frequent_itemsets):
 
     return random_products
 
+# Create Time of Transaction
 def generate_random_time(day):
 
     # Get the current date
@@ -79,6 +82,7 @@ def generate_random_time(day):
 
     return random_time
 
+# Create Transaction
 def generate_transactions(df_products, list_json_frequent_itemsets, total, day):
 
     transaction_detail = []
@@ -135,11 +139,13 @@ if __name__ == '__main__':
     # Read data and convert to Dataframe
     df_products = pd.read_sql_query('SELECT p_id, p_price FROM Products', engine)
     
+    # Create List Frequent itemsets
     list_json_frequent_itemsets = generate_frequent_itemsets(df_products)
 
+    # Create Transaction in 30 Days
     for day in range(0,29):
 
-        total = np.random.randint(400,1500)
+        total = np.random.randint(400,1500) # Total is Number of Day
 
         # Generate Transactions
         df_transactions, df_transaction_detail = generate_transactions(df_products, list_json_frequent_itemsets, total, day)
@@ -160,7 +166,7 @@ if __name__ == '__main__':
         
         sys.stdout.write('\n')
 
-        # Insert Transactions
+        # Insert Transaction Detail
         for index, row in df_transaction_detail.iterrows():
 
             try:
@@ -177,5 +183,6 @@ if __name__ == '__main__':
     
     sys.stdout.write('All Transactions have been Inserted to Transactions table')
     
+    # Commit and Close
     cursor.commit()
     cursor.close()
