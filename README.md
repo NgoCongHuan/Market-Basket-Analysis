@@ -6,6 +6,7 @@ This project performs Market Basket Analysis in Emart Viet Nam using transaction
 ## Table of Contents
 - [Project Structure](#Project-Structure)
 - [Dashboard Preview](#Dashboard-Preview)
+- [Step by Step to Set Up and Run the Project](#Step-by-Step-to-Set-Up-and-Run-the-Project)
 - [Additional Notes](#Additional-Notes)
 - [Contact](#Contact)
 
@@ -31,7 +32,7 @@ Market-Basket-Analysis/
 
 ## Dashboard Preview
 
-![EmartShopping-Dashboard](/assets/EmartShoppingDashboard.ppix)
+![EmartShopping-Dashboard](/assets/EmartShoppingDashboard.png)
 
 ## Step by Step to Set Up and Run the Project
 
@@ -54,24 +55,29 @@ Update the database connection parameters in the scripts as needed (e.g., in Cra
 
 ### 4. Run Scripts in Sequence
 Run the scripts in the following order:
-1. Crawl Data
-```bash python scripts/Crawl-Data.py ```
-1. Generate Transactions
-``` bash python scripts/Generate-Transactions.py ```
-3. Market Basket Analysis
-``` bash python scripts/Market-Basket-Analysis.py ```
+- Crawl Data: This script crawls the data and stores it in the SQL database.
+```bash
+python scripts/Crawl-Data.py
+```
+- Generate Transactions: This script generates transaction data from the crawled data.
+```bash
+python scripts/Generate-Transactions.py
+```
+- Market Basket Analysis: This script performs market basket analysis on trading data using the [Apriori algorithm](https://rasbt.github.io/mlxtend/user_guide/frequent_patterns/association_rules/)
+```bash
+python scripts/Market-Basket-Analysis.py
+```
 
 ### 5. Connect Power BI to SQL Server Management Studio
-1. Open File EmartShoppingDashboard.ppix
-2. Get Data from SQL Server:
+Open File EmartShoppingDashboard.ppix and Get Data from SQL Server:
 - Server: Your server's name in SQL Server
 - Database: EmartShopping
 - Data Connectivity mode: DirectQuery
 
 ## Additional Notes
-This project uses data from the followings source:  
-- Published by: Open Development Vietnam
-- Link: https://data.vietnam.opendevelopmentmekong.net/dataset/fdi-investment-in-vietnam-2015-2022
+This project crawl data in Emart Shopping website:  
+- The Company: THISO RETAIL
+- Link: [EmartShopping](https://emartmall.com.vn/)
 
 ## Contact
 If you have any questions, please contact via email at ngohuan18112002@gmail.com
