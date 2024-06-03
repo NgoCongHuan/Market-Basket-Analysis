@@ -68,7 +68,7 @@ python scripts/Market-Basket-Analysis.py
 ```
 
 ### 5. Connect Power BI to SQL Server Management Studio
-Open File EmartShoppingDashboard.ppix and Get Data from SQL Server:
+Open File [EmartShoppingDashboard.ppix](/insights/EmartShoppingDashboard.ppix) and Get Data from SQL Server:
 - Server: Your server's name in SQL Server
 - Database: EmartShopping
 - Data Connectivity mode: DirectQuery
