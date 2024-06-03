@@ -1,7 +1,6 @@
 # Market Basket Analysis Emart Shopping
 
-## Description
-This project performs Market Basket Analysis in Emart Viet Nam using transactional data. It includes data crawling, transaction generation, and analysis using association rule mining.
+This project performs Market Basket Analysis in [Emart Viet Nam](https://emartmall.com.vn/) using transactional data. It includes data crawling, transaction generation, and analysis using association rule mining.
 
 ## Table of Contents
 - [Project Structure](#Project-Structure)
