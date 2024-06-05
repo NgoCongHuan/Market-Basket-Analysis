@@ -17,7 +17,7 @@ Market-Basket-Analysis/
 ├── database/
 │   └── EmartShopping.sql
 ├── insights/
-│   └── EmartShopping.ppix
+│   └── EmartShopping.pbix
 ├── scripts/
 │   ├── Crawl-Data.py
 │   ├── Generate-Transactions.py
@@ -50,7 +50,7 @@ Create the database using the SQL file provided in the database folder:
 - Execute the SQL script EmartShopping.sql located in the database folder.
 
 ### 3. Change Parameters to Connect to SQL 
-Update the database connection parameters in the scripts as needed (e.g., in Crawl-Data.py, Generate-Transactions.py, and Market-Basket-Analysis.py).
+Update the database connection parameters in the scripts as needed (Crawl-Data.py, Generate-Transactions.py and Market-Basket-Analysis.py).
 
 ### 4. Run Scripts in Sequence
 Run the scripts in the following order:
@@ -68,7 +68,7 @@ python scripts/Market-Basket-Analysis.py
 ```
 
 ### 5. Connect Power BI to SQL Server Management Studio
-Open File [EmartShoppingDashboard.ppix](/insights/EmartShoppingDashboard.ppix) and Get Data from SQL Server:
+Open File [EmartShoppingDashboard.ppix](/insights/EmartShoppingDashboard.pbix) and Get Data from SQL Server:
 - Server: Your server's name in SQL Server
 - Database: EmartShopping
 - Data Connectivity mode: DirectQuery
