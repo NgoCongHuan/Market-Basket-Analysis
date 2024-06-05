@@ -47,7 +47,7 @@ pip install -r requirement.txt
 Create the database using the SQL file provided in the database folder:
 
 - Open your SQL database client.
-- Execute the SQL script EmartShopping.sql located in the database/ folder.
+- Execute the SQL script EmartShopping.sql located in the database folder.
 
 ### 3. Change Parameters to Connect to SQL 
 Update the database connection parameters in the scripts as needed (e.g., in Crawl-Data.py, Generate-Transactions.py, and Market-Basket-Analysis.py).
