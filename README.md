@@ -22,7 +22,7 @@ Market-Basket-Analysis/
 │   ├── Crawl-Data.py
 │   ├── Generate-Transactions.py
 │   └── Market-Basket-Analysis.py
-├── requirement.txt
+├── requirements.txt
 └── README.md
 ```
 - `database/`: Contains the SQL file to create the database.
@@ -40,7 +40,7 @@ Market-Basket-Analysis/
 First, ensure you have Python installed. Then, install the required packages:
 
 ```bash
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 ### 2. Create Database
